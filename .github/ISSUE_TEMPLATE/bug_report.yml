@@ -1,0 +1,51 @@
+name: Bug report
+description: Report an installation, configuration, or rendering problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include tokens, full configuration files, real session IDs, or private paths.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Release tag or commit.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: copilot-version
+    attributes:
+      label: Copilot CLI version
+      placeholder: 1.0.80
+    validations:
+      required: true
+  - type: input
+    id: powershell-version
+    attributes:
+      label: PowerShell version
+      placeholder: 7.5.0
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Replace session IDs, names, and paths with generic examples.
+    validations:
+      required: true

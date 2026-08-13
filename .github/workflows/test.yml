@@ -1,0 +1,32 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  powershell:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -File .\tests\Test-ColorSkill.ps1
+
+      - name: Scan public content
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -File .\tests\Test-PublicContent.ps1
+
+      - name: Validate Agent Skill
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh skill publish --dry-run

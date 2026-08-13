@@ -1,0 +1,62 @@
+{
+  "$schema": "./config.schema.json",
+  "schemaVersion": 1,
+  "theme": {
+    "palette": [
+      39,
+      45,
+      81,
+      111,
+      141,
+      171,
+      207,
+      213,
+      75,
+      114
+    ],
+    "namedColors": {
+      "blue": 39,
+      "cyan": 45,
+      "teal": 44,
+      "sky": 81,
+      "indigo": 75,
+      "green": 114,
+      "lime": 118,
+      "purple": 141,
+      "violet": 135,
+      "magenta": 171,
+      "pink": 207,
+      "rose": 213,
+      "red": 203,
+      "orange": 208,
+      "yellow": 220,
+      "gray": 250,
+      "white": 255
+    },
+    "decoration": {
+      "leftGlyphs": [
+        "░",
+        "▒",
+        "▓",
+        "█"
+      ],
+      "rightGlyphs": [
+        "█",
+        "▓",
+        "▒",
+        "░"
+      ],
+      "intensities": [
+        0.35,
+        0.55,
+        0.75,
+        1.0
+      ]
+    },
+    "boldTitle": true,
+    "showDirectory": false,
+    "directorySeparator": "·",
+    "fallbackSessionName": "Copilot session"
+  },
+  "sessions": {}
+}
