@@ -86,8 +86,12 @@ It controls:
 - whether the current directory name is shown;
 - per-session color and optional title overrides.
 
-See the repository Wiki for configuration examples, architecture,
-troubleshooting, and extension guidance.
+See the repository documentation for:
+
+- [configuration examples](docs/configuration.md);
+- [architecture](docs/architecture.md);
+- [customization and extensibility investigation](docs/extensibility-investigation.md);
+- [release guidance](docs/release-process.md).
 
 ## Privacy
 
