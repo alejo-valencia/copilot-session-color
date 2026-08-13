@@ -1,125 +1,58 @@
 # Copilot Session Color
 
-Give each GitHub Copilot CLI session a distinct, customizable statusline:
+Give each GitHub Copilot CLI session a distinct statusline:
 
 ```text
-░▒▓█ Example Session █▓▒░
+░░▒▒▓▓██ Example Session ██▓▓▒▒░░
 ```
-
-This repository packages the formatter as an installable Agent Skill. Session
-colors are keyed by the active Copilot session ID, so concurrent terminals can
-use different colors without changing the global CLI theme.
-
-## Requirements
-
-- Windows 10 or later
-- GitHub Copilot CLI
-- PowerShell 7 (`pwsh`)
-- GitHub CLI 2.90 or later for `gh skill install`
 
 ## Install
 
-Preview the skill before installing it:
-
 ```powershell
 gh skill preview alejo-valencia/copilot-session-color color
-```
-
-Install it for GitHub Copilot CLI at user scope:
-
-```powershell
 gh skill install alejo-valencia/copilot-session-color color --agent github-copilot --scope user
 ```
 
-Reload skills in existing Copilot sessions:
+Then:
 
 ```text
 /skills reload
-```
-
-Set the current session color:
-
-```text
 /color green
 ```
 
-Other examples:
+Also accepts hex, ANSI 256-color values, and automatic selection:
 
 ```text
-/color purple
 /color #7C3AED
 /color 208
 /color automatic
 ```
 
-The first invocation installs the statusline renderer and updates Copilot's
-user settings. If another custom statusline is already configured, installation
-stops instead of replacing it.
+Unnamed sessions display `Copilot session`. Run `/rename` with no argument to
+generate a name from the conversation, or `/rename <name>` to choose one.
 
-## Update
+The `/color` prompt is processed by the session's active model. Agent Skills
+cannot select a cheaper model per invocation; the actual configuration change
+is performed locally by deterministic PowerShell scripts.
 
-```powershell
-gh skill update color
-```
+## Requirements
 
-Then refresh the installed runtime files:
+Windows 10 or later, PowerShell 7, GitHub Copilot CLI, and GitHub CLI 2.90 or
+later.
 
-```text
-/skills reload
-/color install
-```
+Configuration stays under `%USERPROFILE%\.copilot\session-color\` and no
+telemetry or network calls are made by the runtime scripts.
 
-## Customize
+## Documentation
 
-User configuration is stored locally at:
+- [Behavior and model selection](docs/behavior.md)
+- [Configuration](docs/configuration.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Architecture](docs/architecture.md)
+- [Extensibility investigation](docs/extensibility-investigation.md)
 
-```text
-%USERPROFILE%\.copilot\session-color\config.json
-```
-
-It controls:
-
-- the automatic color palette;
-- named colors;
-- gradient glyphs and intensities;
-- title emphasis;
-- whether the current directory name is shown;
-- per-session color and optional title overrides.
-
-See the repository documentation for:
-
-- [configuration examples](docs/configuration.md);
-- [architecture](docs/architecture.md);
-- [customization and extensibility investigation](docs/extensibility-investigation.md);
-- [release guidance](docs/release-process.md).
-
-## Privacy
-
-- No telemetry or network calls are made by the scripts.
-- Session IDs and overrides remain in the local Copilot configuration folder.
-- The default configuration does not display the working directory.
-- The repository contains no user-specific paths, session IDs, or saved
-  session names.
-
-## Uninstall
-
-Restore the previous statusline configuration:
-
-```text
-/color uninstall
-```
-
-Then remove the skill:
-
-```powershell
-copilot skill remove color
-```
-
-## Status
-
-The initial release is Windows-first. Cross-platform launchers and a richer
-theme command are documented in the extensibility investigation.
-
-## License
+Update with `gh skill update color`, then `/skills reload` and
+`/color install`. Remove with `/color uninstall` followed by
+`copilot skill remove color`.
 
 [MIT](LICENSE)

@@ -10,6 +10,57 @@ $ErrorActionPreference = "Stop"
 
 . (Join-Path $PSScriptRoot "skill-lib.ps1")
 
+function Convert-ArrayToCompactJson {
+    param(
+        [object[]]$Value
+    )
+
+    return ConvertTo-Json -InputObject @($Value) -Compress
+}
+
+function Update-LegacyDefaultDecoration {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ConfigPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DefaultConfigPath
+    )
+
+    if (-not (Test-Path -LiteralPath $ConfigPath)) {
+        return
+    }
+
+    $config = Read-JsonObject -Path $ConfigPath
+    $theme = Get-ObjectProperty -Object $config -Name "theme"
+    $decoration = Get-ObjectProperty -Object $theme -Name "decoration"
+    if ($null -eq $decoration) {
+        return
+    }
+
+    $leftGlyphs = @(Get-ObjectProperty -Object $decoration -Name "leftGlyphs" -Default @())
+    $rightGlyphs = @(Get-ObjectProperty -Object $decoration -Name "rightGlyphs" -Default @())
+    $intensities = @(Get-ObjectProperty -Object $decoration -Name "intensities" -Default @())
+
+    $usesLegacyDefault = (
+        (Convert-ArrayToCompactJson $leftGlyphs) -eq
+            (Convert-ArrayToCompactJson @("░", "▒", "▓", "█")) -and
+        (Convert-ArrayToCompactJson $rightGlyphs) -eq
+            (Convert-ArrayToCompactJson @("█", "▓", "▒", "░")) -and
+        (Convert-ArrayToCompactJson $intensities) -eq
+            (Convert-ArrayToCompactJson @(0.35, 0.55, 0.75, 1.0))
+    )
+    if (-not $usesLegacyDefault) {
+        return
+    }
+
+    $defaults = Read-JsonObject -Path $DefaultConfigPath
+    $defaultTheme = Get-ObjectProperty -Object $defaults -Name "theme"
+    $defaultDecoration = Get-ObjectProperty -Object $defaultTheme -Name "decoration"
+    Set-ObjectProperty -Object $theme -Name "decoration" -Value $defaultDecoration
+    Write-JsonObject -Path $ConfigPath -Value $config
+}
+
 $resolvedHome = Resolve-CopilotHome -Override $CopilotHome
 $runtimeDirectory = Join-Path $resolvedHome "session-color"
 $settingsPath = Join-Path $resolvedHome "settings.json"
@@ -103,6 +154,9 @@ Invoke-WithSessionColorLock -Name "state" -Action {
             -Source (Join-Path $PSScriptRoot "default-config.json") `
             -Destination $configPath
     }
+    Update-LegacyDefaultDecoration `
+        -ConfigPath $configPath `
+        -DefaultConfigPath (Join-Path $PSScriptRoot "default-config.json")
 
     $footer = Get-ObjectProperty -Object $settings -Name "footer"
     if ($null -eq $footer) {

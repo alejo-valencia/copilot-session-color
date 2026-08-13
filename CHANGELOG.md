@@ -2,6 +2,13 @@
 
 All notable changes will be documented in this file.
 
+## 0.1.1 - 2026-08-13
+
+- Double the default gradient length.
+- Migrate unchanged four-character decorations during installation.
+- Document active-model behavior and native unnamed-session naming.
+- Shorten the README and keep all documentation in versioned Markdown files.
+
 ## 0.1.0 - 2026-08-13
 
 - Package the statusline formatter as an installable `color` Agent Skill.

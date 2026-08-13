@@ -31,7 +31,7 @@ Review the repository for:
 Update:
 
 - `CHANGELOG.md`;
-- Wiki documentation when behavior or configuration changes;
+- Markdown documentation when behavior or configuration changes;
 - `schemaVersion` only for breaking configuration changes.
 
 ## Publish

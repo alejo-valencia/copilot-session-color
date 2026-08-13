@@ -9,4 +9,4 @@ Describe the user-visible change.
 - [ ] Existing statusline settings remain conflict-safe.
 - [ ] No real session IDs, names, private paths, secrets, or internal project
       details were added.
-- [ ] Documentation and Wiki changes are included when needed.
+- [ ] Relevant Markdown documentation changes are included.

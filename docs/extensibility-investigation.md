@@ -31,9 +31,12 @@ Confidence labels:
   settings before publication.
 - `gh skill` is currently a preview feature and requires GitHub CLI 2.90 or
   later.
+- Agent Skill frontmatter has no model-selection field. The active session or
+  agent configuration determines which model processes an invocation.
 
 Implication: the project must remain a small, clean repository with every
-runtime dependency inside `skills/color`.
+runtime dependency inside `skills/color`. A cheaper model cannot be selected
+for `/color` independently of the session.
 
 ### Copilot custom statusline
 
@@ -94,7 +97,7 @@ The repository now includes:
 | Control-character and ANSI injection sanitization | Implemented |
 | PowerShell behavioral tests | Implemented |
 | Agent Skill publish dry run | Passing locally |
-| Public repository Wiki | Prepared for publication |
+| Versioned Markdown documentation | Implemented |
 
 ## Changes needed for deeper customization
 
@@ -130,9 +133,9 @@ Separate decoration from color:
 ```json
 {
   "name": "gradient-blocks",
-  "leftGlyphs": ["░", "▒", "▓", "█"],
-  "rightGlyphs": ["█", "▓", "▒", "░"],
-  "intensities": [0.35, 0.55, 0.75, 1.0]
+  "leftGlyphs": ["░", "░", "▒", "▒", "▓", "▓", "█", "█"],
+  "rightGlyphs": ["█", "█", "▓", "▓", "▒", "▒", "░", "░"],
+  "intensities": [0.2, 0.3, 0.4, 0.5, 0.65, 0.8, 0.9, 1.0]
 }
 ```
 
@@ -320,7 +323,7 @@ startup time, or host compatibility.
 
 | Phase | Outcome |
 |---|---|
-| `v0.1` | Publish Windows-first skill, installer, config, tests, and Wiki |
+| `v0.1` | Publish Windows-first skill, installer, config, tests, and Markdown docs |
 | `v0.2` | Add theme presets, preview, and validation commands |
 | `v0.3` | Add versioned segments and measured performance budget |
 | `v0.4` | Add configuration migrations and release compatibility policy |

@@ -32,5 +32,5 @@ gh skill publish --dry-run
 - Validate configuration instead of silently accepting malformed values.
 - Keep the renderer fast and free of network calls.
 - Add tests for behavioral changes.
-- Update the Wiki and extensibility investigation when adding an extension
-  point or changing the configuration schema.
+- Update the relevant Markdown docs and extensibility investigation when adding
+  an extension point or changing the configuration schema.

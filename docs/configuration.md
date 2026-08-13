@@ -50,7 +50,7 @@ After saving:
 The default mirrored gradient is:
 
 ```text
-░▒▓█ Example Session █▓▒░
+░░▒▒▓▓██ Example Session ██▓▓▒▒░░
 ```
 
 It is configured with matching arrays:
@@ -59,9 +59,9 @@ It is configured with matching arrays:
 {
   "theme": {
     "decoration": {
-      "leftGlyphs": ["░", "▒", "▓", "█"],
-      "rightGlyphs": ["█", "▓", "▒", "░"],
-      "intensities": [0.35, 0.55, 0.75, 1.0]
+      "leftGlyphs": ["░", "░", "▒", "▒", "▓", "▓", "█", "█"],
+      "rightGlyphs": ["█", "█", "▓", "▓", "▒", "▒", "░", "░"],
+      "intensities": [0.2, 0.3, 0.4, 0.5, 0.65, 0.8, 0.9, 1.0]
     }
   }
 }

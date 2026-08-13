@@ -149,15 +149,26 @@ try {
     $rendered = Invoke-Renderer -ScriptPath $runtimeScript -Payload $payload
     $plain = $rendered -replace "`e\[[0-9;]*m", ""
     Assert-True (
-        $plain -eq "░▒▓█ Example Session █▓▒░"
+        $plain -eq "░░▒▒▓▓██ Example Session ██▓▓▒▒░░"
     ) "Default rendered output is incorrect: '$plain'."
+
+    $unnamedPayload = [pscustomobject]@{
+        session_id = $sessionId
+        session_name = ""
+        cwd = "C:\projects\sample"
+    } | ConvertTo-Json -Compress
+    $unnamedRendered = Invoke-Renderer -ScriptPath $runtimeScript -Payload $unnamedPayload
+    $unnamedPlain = $unnamedRendered -replace "`e\[[0-9;]*m", ""
+    Assert-True (
+        $unnamedPlain -eq "░░▒▒▓▓██ Copilot session ██▓▓▒▒░░"
+    ) "Unnamed session fallback is incorrect: '$unnamedPlain'."
 
     $config.theme.showDirectory = $true
     Write-TestJson -Path $configPath -Value $config
     $renderedWithDirectory = Invoke-Renderer -ScriptPath $runtimeScript -Payload $payload
     $plainWithDirectory = $renderedWithDirectory -replace "`e\[[0-9;]*m", ""
     Assert-True (
-        $plainWithDirectory -eq "░▒▓█ Example Session █▓▒░ · sample"
+        $plainWithDirectory -eq "░░▒▒▓▓██ Example Session ██▓▓▒▒░░ · sample"
     ) "Directory rendering is incorrect: '$plainWithDirectory'."
 
     $unsafePayload = [pscustomobject]@{
@@ -168,7 +179,7 @@ try {
     $safeRendered = Invoke-Renderer -ScriptPath $runtimeScript -Payload $unsafePayload
     $safePlain = $safeRendered -replace "`e\[[0-9;]*m", ""
     Assert-True (
-        $safePlain -eq "░▒▓█ Example Session Name █▓▒░ · sample"
+        $safePlain -eq "░░▒▒▓▓██ Example Session Name ██▓▓▒▒░░ · sample"
     ) "Renderer did not neutralize control characters: '$safePlain'."
 
     & $setColorScript `
@@ -198,11 +209,32 @@ try {
         $automaticStyle.title -eq "Local Title"
     ) "Automatic mode removed the local title override."
 
+    $config.theme.decoration = [pscustomobject]@{
+        leftGlyphs = @("░", "▒", "▓", "█")
+        rightGlyphs = @("█", "▓", "▒", "░")
+        intensities = @(0.35, 0.55, 0.75, 1.0)
+    }
+    Write-TestJson -Path $configPath -Value $config
     & $installScript -CopilotHome $copilotHome -Quiet
     $configAfterUpgrade = Get-Content -Raw $configPath | ConvertFrom-Json -Depth 64
     Assert-True (
         $configAfterUpgrade.theme.showDirectory -eq $true
     ) "Reinstall replaced the user's configuration."
+    Assert-True (
+        @($configAfterUpgrade.theme.decoration.leftGlyphs).Count -eq 8
+    ) "Reinstall did not migrate the original four-character decoration."
+
+    $configAfterUpgrade.theme.decoration = [pscustomobject]@{
+        leftGlyphs = @("[")
+        rightGlyphs = @("]")
+        intensities = @(1.0)
+    }
+    Write-TestJson -Path $configPath -Value $configAfterUpgrade
+    & $installScript -CopilotHome $copilotHome -Quiet
+    $configAfterCustomUpgrade = Get-Content -Raw $configPath | ConvertFrom-Json -Depth 64
+    Assert-True (
+        @($configAfterCustomUpgrade.theme.decoration.leftGlyphs).Count -eq 1
+    ) "Reinstall replaced a custom decoration."
     & $uninstallScript -CopilotHome $copilotHome | Out-Null
 
     $restoredSettings = Get-Content -Raw $settingsPath | ConvertFrom-Json -Depth 64

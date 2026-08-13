@@ -64,3 +64,12 @@ complete removal.
 
 The statusline should refresh automatically. If it does not, tell the user to
 run `/restart` once.
+
+## Session names and models
+
+- If `session_name` is empty, the renderer uses the configured fallback
+  `Copilot session`.
+- Recommend native `/rename` with no argument to generate a name from the
+  conversation. Do not read transcripts or infer a name inside the renderer.
+- This skill is processed by the active session model. Agent Skills have no
+  per-skill model field; do not claim that `/color` can force a cheaper model.
