@@ -1,18 +1,16 @@
 # Copilot Session Color
 
-Give each GitHub Copilot CLI session a distinct statusline:
+Give each GitHub Copilot CLI session a distinct statusline.
 
-```text
-░░▒▒▓▓██          Example Session          ██▓▓▒▒░░
-```
+> [!IMPORTANT]
+> **Install command not working?** If `gh` reports
+> `unknown command "skill"`, update GitHub CLI to 2.90 or later with
+> `winget upgrade --id GitHub.cli -e`, reopen PowerShell, and see
+> [Troubleshooting](docs/troubleshooting.md#unknown-command-skill-for-gh).
+
+![A GitHub Copilot CLI session with a colored Example Session statusline](docs/assets/session-color-demo.png)
 
 ## Install
-
-`gh skill` requires GitHub CLI 2.90 or later:
-
-```powershell
-winget upgrade --id GitHub.cli -e
-```
 
 ```powershell
 gh skill preview alejo-valencia/copilot-session-color color
