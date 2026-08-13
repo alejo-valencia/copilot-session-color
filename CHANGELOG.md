@@ -2,7 +2,7 @@
 
 All notable changes will be documented in this file.
 
-## Unreleased
+## 0.1.0 - 2026-08-13
 
 - Package the statusline formatter as an installable `color` Agent Skill.
 - Add conflict-safe installation and uninstall workflows.
