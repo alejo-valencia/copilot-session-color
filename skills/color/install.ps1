@@ -18,7 +18,7 @@ function Convert-ArrayToCompactJson {
     return ConvertTo-Json -InputObject @($Value) -Compress
 }
 
-function Update-LegacyDefaultDecoration {
+function Update-ConfigDefaults {
     param(
         [Parameter(Mandatory = $true)]
         [string]$ConfigPath,
@@ -34,31 +34,48 @@ function Update-LegacyDefaultDecoration {
     $config = Read-JsonObject -Path $ConfigPath
     $theme = Get-ObjectProperty -Object $config -Name "theme"
     $decoration = Get-ObjectProperty -Object $theme -Name "decoration"
-    if ($null -eq $decoration) {
-        return
+    $changed = $false
+    $usesLegacyDefault = $false
+    if ($null -ne $decoration) {
+        $leftGlyphs = @(Get-ObjectProperty -Object $decoration -Name "leftGlyphs" -Default @())
+        $rightGlyphs = @(Get-ObjectProperty -Object $decoration -Name "rightGlyphs" -Default @())
+        $intensities = @(Get-ObjectProperty -Object $decoration -Name "intensities" -Default @())
+        $usesLegacyDefault = (
+            (Convert-ArrayToCompactJson $leftGlyphs) -eq
+                (Convert-ArrayToCompactJson @("░", "▒", "▓", "█")) -and
+            (Convert-ArrayToCompactJson $rightGlyphs) -eq
+                (Convert-ArrayToCompactJson @("█", "▓", "▒", "░")) -and
+            (Convert-ArrayToCompactJson $intensities) -eq
+                (Convert-ArrayToCompactJson @(0.35, 0.55, 0.75, 1.0))
+        )
     }
-
-    $leftGlyphs = @(Get-ObjectProperty -Object $decoration -Name "leftGlyphs" -Default @())
-    $rightGlyphs = @(Get-ObjectProperty -Object $decoration -Name "rightGlyphs" -Default @())
-    $intensities = @(Get-ObjectProperty -Object $decoration -Name "intensities" -Default @())
-
-    $usesLegacyDefault = (
-        (Convert-ArrayToCompactJson $leftGlyphs) -eq
-            (Convert-ArrayToCompactJson @("░", "▒", "▓", "█")) -and
-        (Convert-ArrayToCompactJson $rightGlyphs) -eq
-            (Convert-ArrayToCompactJson @("█", "▓", "▒", "░")) -and
-        (Convert-ArrayToCompactJson $intensities) -eq
-            (Convert-ArrayToCompactJson @(0.35, 0.55, 0.75, 1.0))
-    )
-    if (-not $usesLegacyDefault) {
-        return
-    }
-
     $defaults = Read-JsonObject -Path $DefaultConfigPath
     $defaultTheme = Get-ObjectProperty -Object $defaults -Name "theme"
-    $defaultDecoration = Get-ObjectProperty -Object $defaultTheme -Name "decoration"
-    Set-ObjectProperty -Object $theme -Name "decoration" -Value $defaultDecoration
-    Write-JsonObject -Path $ConfigPath -Value $config
+    if ($usesLegacyDefault) {
+        $defaultDecoration = Get-ObjectProperty -Object $defaultTheme -Name "decoration"
+        Set-ObjectProperty -Object $theme -Name "decoration" -Value $defaultDecoration
+        $changed = $true
+    }
+
+    if ($null -eq $theme.PSObject.Properties["titleWidth"]) {
+        Set-ObjectProperty `
+            -Object $theme `
+            -Name "titleWidth" `
+            -Value (Get-ObjectProperty -Object $defaultTheme -Name "titleWidth" -Default 35)
+        $changed = $true
+    }
+
+    if ($null -eq $theme.PSObject.Properties["titleBackground"]) {
+        Set-ObjectProperty `
+            -Object $theme `
+            -Name "titleBackground" `
+            -Value (Get-ObjectProperty -Object $defaultTheme -Name "titleBackground" -Default "solid")
+        $changed = $true
+    }
+
+    if ($changed) {
+        Write-JsonObject -Path $ConfigPath -Value $config
+    }
 }
 
 $resolvedHome = Resolve-CopilotHome -Override $CopilotHome
@@ -154,7 +171,7 @@ Invoke-WithSessionColorLock -Name "state" -Action {
             -Source (Join-Path $PSScriptRoot "default-config.json") `
             -Destination $configPath
     }
-    Update-LegacyDefaultDecoration `
+    Update-ConfigDefaults `
         -ConfigPath $configPath `
         -DefaultConfigPath (Join-Path $PSScriptRoot "default-config.json")
 

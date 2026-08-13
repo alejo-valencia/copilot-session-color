@@ -44,6 +44,19 @@ The renderer deliberately does not read transcript files or call a model to
 invent a name. That would add latency, depend on undocumented storage, and
 create unnecessary privacy risk.
 
+## Title width and truncation
+
+The center title field is exactly 35 text characters by default:
+
+- shorter names are centered;
+- longer names keep the first 32 characters and add `...`;
+- the complete center field uses one solid session-color background;
+- black or white title text is selected automatically for contrast;
+- gradient color appears only in the outer decoration.
+
+The width and background mode are configurable through `theme.titleWidth` and
+`theme.titleBackground`.
+
 ## Sources
 
 - [Agent Skills specification](https://agentskills.io/specification)

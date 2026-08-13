@@ -3,10 +3,16 @@
 Give each GitHub Copilot CLI session a distinct statusline:
 
 ```text
-░░▒▒▓▓██ Example Session ██▓▓▒▒░░
+░░▒▒▓▓██          Example Session          ██▓▓▒▒░░
 ```
 
 ## Install
+
+`gh skill` requires GitHub CLI 2.90 or later:
+
+```powershell
+winget upgrade --id GitHub.cli -e
+```
 
 ```powershell
 gh skill preview alejo-valencia/copilot-session-color color
@@ -30,6 +36,8 @@ Also accepts hex, ANSI 256-color values, and automatic selection:
 
 Unnamed sessions display `Copilot session`. Run `/rename` with no argument to
 generate a name from the conversation, or `/rename <name>` to choose one.
+The center is always 35 characters, with centered text, `...` truncation, and
+a solid session-color background. Only the outer bars use a gradient.
 
 The `/color` prompt is processed by the session's active model. Agent Skills
 cannot select a cheaper model per invocation; the actual configuration change

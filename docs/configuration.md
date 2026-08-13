@@ -50,7 +50,7 @@ After saving:
 The default mirrored gradient is:
 
 ```text
-░░▒▒▓▓██ Example Session ██▓▓▒▒░░
+░░▒▒▓▓██          Example Session          ██▓▓▒▒░░
 ```
 
 It is configured with matching arrays:
@@ -69,6 +69,24 @@ It is configured with matching arrays:
 
 All three arrays must have the same length. Use empty arrays to remove the
 decoration.
+
+## Title field
+
+The title field is exactly 35 characters by default. Short names are centered;
+long names keep the first 32 characters and add `...`.
+
+```json
+{
+  "theme": {
+    "titleWidth": 35,
+    "titleBackground": "solid"
+  }
+}
+```
+
+`solid` fills the complete fixed-width field with the session color and
+automatically chooses black or white text for contrast. `none` keeps the fixed
+width with no background. Gradient color is used only by the outer decoration.
 
 A simple bracket theme uses one element:
 

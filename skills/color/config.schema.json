@@ -23,6 +23,8 @@
         "namedColors",
         "decoration",
         "boldTitle",
+        "titleWidth",
+        "titleBackground",
         "showDirectory",
         "directorySeparator",
         "fallbackSessionName"
@@ -88,6 +90,18 @@
         },
         "boldTitle": {
           "type": "boolean"
+        },
+        "titleWidth": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 120
+        },
+        "titleBackground": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "none"
+          ]
         },
         "showDirectory": {
           "type": "boolean"

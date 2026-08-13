@@ -66,6 +66,8 @@
       ]
     },
     "boldTitle": true,
+    "titleWidth": 35,
+    "titleBackground": "solid",
     "showDirectory": false,
     "directorySeparator": "·",
     "fallbackSessionName": "Copilot session"

@@ -57,6 +57,40 @@ function ConvertTo-SafeStatusText {
     return $safeValue
 }
 
+function Get-CenteredTextLayout {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Value,
+
+        [ValidateRange(8, 120)]
+        [int]$Width
+    )
+
+    $elements = [Collections.Generic.List[string]]::new()
+    $enumerator = [Globalization.StringInfo]::GetTextElementEnumerator($Value)
+    while ($enumerator.MoveNext()) {
+        $elements.Add($enumerator.GetTextElement())
+    }
+
+    if ($elements.Count -gt $Width) {
+        $content = (($elements | Select-Object -First ($Width - 3)) -join "") + "..."
+        return [pscustomobject]@{
+            Text = $content
+            LeftPadding = 0
+            RightPadding = 0
+        }
+    }
+
+    $remaining = $Width - $elements.Count
+    $leftPadding = [math]::Floor($remaining / 2)
+    $rightPadding = $remaining - $leftPadding
+    return [pscustomobject]@{
+        Text = $Value
+        LeftPadding = $leftPadding
+        RightPadding = $rightPadding
+    }
+}
+
 function ConvertFrom-Ansi256Color {
     param(
         [Parameter(Mandatory = $true)]
@@ -142,6 +176,28 @@ function Get-GradientBar {
     }
 
     return $segments -join ""
+}
+
+function Get-ContrastForeground {
+    param(
+        [Parameter(Mandatory = $true)]
+        [int[]]$Rgb
+    )
+
+    if ($Rgb.Count -ne 3) {
+        throw "RGB colors must contain exactly three values."
+    }
+
+    $luminance = (
+        (0.299 * $Rgb[0]) +
+        (0.587 * $Rgb[1]) +
+        (0.114 * $Rgb[2])
+    )
+    if ($luminance -ge 150) {
+        return @(0, 0, 0)
+    }
+
+    return @(255, 255, 255)
 }
 
 function Write-ConfigurationError {
@@ -295,21 +351,46 @@ try {
 
     $escape = [char]27
     $reset = "$escape[0m"
-    $titlePrefix = if ([bool](
+    $titleWidth = [int](
+        Get-ObjectProperty -Object $theme -Name "titleWidth" -Default 35
+    )
+    if ($titleWidth -lt 8 -or $titleWidth -gt 120) {
+        throw "Title width must be between 8 and 120."
+    }
+    $titleLayout = Get-CenteredTextLayout -Value $sessionName -Width $titleWidth
+    $displayTitle = (
+        (" " * $titleLayout.LeftPadding) +
+        $titleLayout.Text +
+        (" " * $titleLayout.RightPadding)
+    )
+    $titleBackground = [string](
+        Get-ObjectProperty -Object $theme -Name "titleBackground" -Default "solid"
+    )
+    $titleIsBold = [bool](
         Get-ObjectProperty -Object $theme -Name "boldTitle" -Default $true
-    )) {
+    )
+    $titlePrefix = if ($titleBackground -eq "solid") {
+        $rgb = ConvertFrom-Ansi256Color -Color $color
+        $foreground = Get-ContrastForeground -Rgb $rgb
+        $weight = if ($titleIsBold) { "1;" } else { "" }
+        "$escape[$($weight)38;2;$($foreground[0]);$($foreground[1]);$($foreground[2]);48;2;$($rgb[0]);$($rgb[1]);$($rgb[2])m"
+    }
+    elseif ($titleBackground -eq "none" -and $titleIsBold) {
         "$escape[1;38;5;$($color)m"
     }
-    else {
+    elseif ($titleBackground -eq "none") {
         "$escape[38;5;$($color)m"
     }
+    else {
+        throw "Title background must be 'solid' or 'none'."
+    }
 
-    $titleSegment = "$titlePrefix$sessionName$reset"
+    $titleSegment = "$titlePrefix$displayTitle$reset"
     $sessionSegment = if ($leftGlyphs.Count -eq 0) {
         $titleSegment
     }
     else {
-        "$leftGradient $titleSegment $rightGradient$reset"
+        "$leftGradient$titleSegment$rightGradient$reset"
     }
 
     $showDirectory = [bool](

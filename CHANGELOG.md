@@ -2,6 +2,14 @@
 
 All notable changes will be documented in this file.
 
+## 0.1.2 - 2026-08-13
+
+- Add a centered, fixed-width 35-character title field.
+- Truncate long session names to 32 characters plus `...`.
+- Use a solid session-color title background with automatic contrast while
+  keeping gradients only on the outer decoration.
+- Document the GitHub CLI 2.90 requirement and Windows upgrade diagnostics.
+
 ## 0.1.1 - 2026-08-13
 
 - Double the default gradient length.

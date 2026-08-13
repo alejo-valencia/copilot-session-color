@@ -181,24 +181,25 @@ handling, and trust boundaries.
 
 ### 4. Foreground and background modes
 
-**Proposed**
+**Implemented baseline; proposed expansion**
 
-Add a rendering mode:
+The title currently supports:
 
 ```json
 {
-  "colorMode": "foreground"
+  "titleBackground": "solid"
 }
 ```
 
-Potential values:
+Current values:
 
-- `foreground`;
-- `background`;
-- `decoration-only`.
+- `solid`: fixed-width session-color background with automatic black or white
+  foreground;
+- `none`: fixed-width title with colored foreground only.
 
-Background rendering requires terminal-contrast testing and accessibility
-guidance before becoming a default.
+Future modes could include decoration-only color and separately configurable
+foreground/background tokens. Accessibility and terminal-contrast tests should
+remain release gates.
 
 ### 5. Configuration commands and migration
 

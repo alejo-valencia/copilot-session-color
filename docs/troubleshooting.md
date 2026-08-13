@@ -1,5 +1,27 @@
 # Troubleshooting
 
+## `unknown command "skill" for "gh"`
+
+`gh skill` requires GitHub CLI 2.90 or later:
+
+```powershell
+gh --version
+winget upgrade --id GitHub.cli -e
+```
+
+Open a new PowerShell window after upgrading. If the error remains, inspect
+which executable the shell resolves:
+
+```powershell
+Get-Command gh -All
+```
+
+On a standard Windows installation, bypass aliases or older PATH entries with:
+
+```powershell
+& "C:\Program Files\GitHub CLI\gh.exe" skill install alejo-valencia/copilot-session-color color --agent github-copilot --scope user
+```
+
 ## `/color` is not recognized
 
 ```text

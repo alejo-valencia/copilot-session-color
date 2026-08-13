@@ -149,8 +149,17 @@ try {
     $rendered = Invoke-Renderer -ScriptPath $runtimeScript -Payload $payload
     $plain = $rendered -replace "`e\[[0-9;]*m", ""
     Assert-True (
-        $plain -eq "░░▒▒▓▓██ Example Session ██▓▓▒▒░░"
+        $plain -eq "░░▒▒▓▓██          Example Session          ██▓▓▒▒░░"
     ) "Default rendered output is incorrect: '$plain'."
+    Assert-True (
+        $plain.Substring(8, 35).Length -eq 35
+    ) "Rendered title field is not exactly 35 characters."
+    Assert-True (
+        [regex]::Matches($rendered, "48;2;").Count -eq 1
+    ) "Title field does not use one solid background color."
+    Assert-True (
+        $rendered.Contains("38;2;0;0;0;48;2;135;215;135")
+    ) "Title field did not choose a contrasting foreground."
 
     $unnamedPayload = [pscustomobject]@{
         session_id = $sessionId
@@ -160,15 +169,26 @@ try {
     $unnamedRendered = Invoke-Renderer -ScriptPath $runtimeScript -Payload $unnamedPayload
     $unnamedPlain = $unnamedRendered -replace "`e\[[0-9;]*m", ""
     Assert-True (
-        $unnamedPlain -eq "░░▒▒▓▓██ Copilot session ██▓▓▒▒░░"
+        $unnamedPlain -eq "░░▒▒▓▓██          Copilot session          ██▓▓▒▒░░"
     ) "Unnamed session fallback is incorrect: '$unnamedPlain'."
+
+    $longPayload = [pscustomobject]@{
+        session_id = $sessionId
+        session_name = "123456789012345678901234567890123456"
+        cwd = "C:\projects\sample"
+    } | ConvertTo-Json -Compress
+    $longRendered = Invoke-Renderer -ScriptPath $runtimeScript -Payload $longPayload
+    $longPlain = $longRendered -replace "`e\[[0-9;]*m", ""
+    Assert-True (
+        $longPlain -eq "░░▒▒▓▓██12345678901234567890123456789012...██▓▓▒▒░░"
+    ) "Long session name was not truncated to 35 characters: '$longPlain'."
 
     $config.theme.showDirectory = $true
     Write-TestJson -Path $configPath -Value $config
     $renderedWithDirectory = Invoke-Renderer -ScriptPath $runtimeScript -Payload $payload
     $plainWithDirectory = $renderedWithDirectory -replace "`e\[[0-9;]*m", ""
     Assert-True (
-        $plainWithDirectory -eq "░░▒▒▓▓██ Example Session ██▓▓▒▒░░ · sample"
+        $plainWithDirectory -eq "░░▒▒▓▓██          Example Session          ██▓▓▒▒░░ · sample"
     ) "Directory rendering is incorrect: '$plainWithDirectory'."
 
     $unsafePayload = [pscustomobject]@{
@@ -179,7 +199,7 @@ try {
     $safeRendered = Invoke-Renderer -ScriptPath $runtimeScript -Payload $unsafePayload
     $safePlain = $safeRendered -replace "`e\[[0-9;]*m", ""
     Assert-True (
-        $safePlain -eq "░░▒▒▓▓██ Example Session Name ██▓▓▒▒░░ · sample"
+        $safePlain -eq "░░▒▒▓▓██       Example Session Name        ██▓▓▒▒░░ · sample"
     ) "Renderer did not neutralize control characters: '$safePlain'."
 
     & $setColorScript `
@@ -214,6 +234,8 @@ try {
         rightGlyphs = @("█", "▓", "▒", "░")
         intensities = @(0.35, 0.55, 0.75, 1.0)
     }
+    $config.theme.PSObject.Properties.Remove("titleWidth")
+    $config.theme.PSObject.Properties.Remove("titleBackground")
     Write-TestJson -Path $configPath -Value $config
     & $installScript -CopilotHome $copilotHome -Quiet
     $configAfterUpgrade = Get-Content -Raw $configPath | ConvertFrom-Json -Depth 64
@@ -223,6 +245,10 @@ try {
     Assert-True (
         @($configAfterUpgrade.theme.decoration.leftGlyphs).Count -eq 8
     ) "Reinstall did not migrate the original four-character decoration."
+    Assert-True (
+        $configAfterUpgrade.theme.titleWidth -eq 35 -and
+        $configAfterUpgrade.theme.titleBackground -eq "solid"
+    ) "Reinstall did not add fixed-width solid title defaults."
 
     $configAfterUpgrade.theme.decoration = [pscustomobject]@{
         leftGlyphs = @("[")
