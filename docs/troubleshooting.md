@@ -2,21 +2,27 @@
 
 ## `unknown command "skill" for "gh"`
 
-`gh skill` requires GitHub CLI 2.90 or later:
+`gh skill` requires GitHub CLI 2.90 or later. This error usually means the
+current shell is resolving an older `gh.exe`, even when a newer version is
+installed elsewhere.
+
+Inspect every executable on `PATH` and check the standard Windows
+installation directly:
 
 ```powershell
 gh --version
+Get-Command gh -All
+& "C:\Program Files\GitHub CLI\gh.exe" --version
+```
+
+Upgrade GitHub CLI if the resolved version is older than 2.90:
+
+```powershell
 winget upgrade --id GitHub.cli -e
 ```
 
-Open a new PowerShell window after upgrading. If the error remains, inspect
-which executable the shell resolves:
-
-```powershell
-Get-Command gh -All
-```
-
-On a standard Windows installation, bypass aliases or older PATH entries with:
+Open a new PowerShell window after upgrading. If `gh` still resolves to an
+older executable, bypass aliases or stale `PATH` entries:
 
 ```powershell
 & "C:\Program Files\GitHub CLI\gh.exe" skill install alejo-valencia/copilot-session-color color --agent github-copilot --scope user
