@@ -73,6 +73,20 @@ function Update-ConfigDefaults {
         $changed = $true
     }
 
+    $defaultPrompts = Get-ObjectProperty -Object $defaults -Name "prompts"
+    $prompts = Get-ObjectProperty -Object $config -Name "prompts"
+    if ($null -eq $prompts -or $prompts -isnot [pscustomobject]) {
+        Set-ObjectProperty -Object $config -Name "prompts" -Value $defaultPrompts
+        $changed = $true
+    }
+    elseif ($null -eq $prompts.PSObject.Properties["restartNotice"]) {
+        Set-ObjectProperty `
+            -Object $prompts `
+            -Name "restartNotice" `
+            -Value (Get-ObjectProperty -Object $defaultPrompts -Name "restartNotice")
+        $changed = $true
+    }
+
     if ($changed) {
         Write-JsonObject -Path $ConfigPath -Value $config
     }
@@ -193,5 +207,5 @@ Invoke-WithSessionColorLock -Name "state" -Action {
 
 if (-not $Quiet) {
     "Installed Copilot Session Color in '$runtimeDirectory'."
-    "Run /restart if the statusline does not appear automatically."
+    "After the first /color command in a session, run /restart once if the statusline is not visible yet."
 }

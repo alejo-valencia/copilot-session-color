@@ -9,6 +9,10 @@ The installer creates:
 Changes are read on the next statusline refresh. Keep `schemaVersion` set to
 `1`.
 
+The first `/color` command in a session can install the statusline before
+Copilot has loaded it. If the new statusline is not visible yet, run `/restart`
+once.
+
 ## Palette
 
 Automatic mode hashes the active session ID into `theme.palette`:
@@ -117,6 +121,21 @@ Directory display is disabled by default:
 
 When enabled, the renderer shows only the final directory name, not the full
 path.
+
+## Prompts
+
+The skill prints restart guidance after changing a color:
+
+```json
+{
+  "prompts": {
+    "restartNotice": "If this is your first /color command in this session and the color is not visible yet, run /restart once to apply the statusline."
+  }
+}
+```
+
+Set `prompts.restartNotice` to the message users should see after `/color`
+changes. Use an empty string to suppress the extra guidance.
 
 ## Session overrides
 

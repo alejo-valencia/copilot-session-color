@@ -6,6 +6,7 @@
   "required": [
     "schemaVersion",
     "theme",
+    "prompts",
     "sessions"
   ],
   "properties": {
@@ -114,6 +115,20 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 80
+        }
+      }
+    },
+    "prompts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "restartNotice"
+      ],
+      "properties": {
+        "restartNotice": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
         }
       }
     },
