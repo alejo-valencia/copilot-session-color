@@ -72,5 +72,8 @@
     "directorySeparator": "·",
     "fallbackSessionName": "Copilot session"
   },
+  "prompts": {
+    "restartNotice": "If this is your first /color command in this session and the color is not visible yet, run /restart once to apply the statusline."
+  },
   "sessions": {}
 }

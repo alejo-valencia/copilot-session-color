@@ -38,7 +38,8 @@ Confirm installation with `copilot skill list`.
 
 ## The statusline does not appear
 
-Confirm `pwsh --version` works, then run:
+After the first `/color` command in a session, the statusline might not be
+visible until Copilot restarts. Confirm `pwsh --version` works, then run:
 
 ```text
 /restart

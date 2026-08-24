@@ -24,6 +24,9 @@ Then:
 /color green
 ```
 
+If this is the first `/color` command in the session and the statusline does
+not appear, run `/restart` once to apply it.
+
 Also accepts hex, ANSI 256-color values, and automatic selection:
 
 ```text

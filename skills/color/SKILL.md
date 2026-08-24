@@ -18,6 +18,9 @@ When the user invokes `/color <value>`:
    user explicitly approved replacing another custom statusline.
 2. Run `set-session-color.ps1 -Color "<value>"` from this skill directory.
 3. Report the selected color and session ID returned by the script.
+4. Also report the script's restart notice. Make clear that after the first
+   `/color` command in a session, the new statusline might not be visible until
+   the user runs `/restart` once.
 
 The setter reads `COPILOT_AGENT_SESSION_ID`, which identifies the session that
 invoked the skill.
@@ -62,8 +65,9 @@ complete removal.
 - Do not modify the global Copilot theme.
 - Do not make network requests.
 
-The statusline should refresh automatically. If it does not, tell the user to
-run `/restart` once.
+The statusline should refresh automatically after it has loaded once. If this
+is the first `/color` command in a session, tell the user it might not be
+visible until they run `/restart` once.
 
 ## Session names and models
 

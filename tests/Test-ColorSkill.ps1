@@ -130,15 +130,20 @@ try {
         $null -eq $settings.statusLine.PSObject.Properties["refreshInterval"]
     ) "Installer enabled timer-based statusline polling."
 
-    & $setColorScript `
+    $setColorOutput = & $setColorScript `
         -Color green `
         -SessionId $sessionId `
-        -CopilotHome $copilotHome |
-        Out-Null
+        -CopilotHome $copilotHome
 
     $config = Get-Content -Raw $configPath | ConvertFrom-Json -Depth 64
     $sessionStyle = $config.sessions.PSObject.Properties[$sessionId].Value
     Assert-True ($sessionStyle.ansiColor -eq 114) "Named color was not stored."
+    Assert-True (
+        $config.prompts.restartNotice -match "/restart"
+    ) "Default restart notice was not configured."
+    Assert-True (
+        ($setColorOutput -join [Environment]::NewLine) -match "first /color command.+/restart"
+    ) "Set-color output did not include restart guidance."
 
     $payload = [pscustomobject]@{
         session_id = $sessionId
@@ -236,6 +241,7 @@ try {
     }
     $config.theme.PSObject.Properties.Remove("titleWidth")
     $config.theme.PSObject.Properties.Remove("titleBackground")
+    $config.PSObject.Properties.Remove("prompts")
     Write-TestJson -Path $configPath -Value $config
     & $installScript -CopilotHome $copilotHome -Quiet
     $configAfterUpgrade = Get-Content -Raw $configPath | ConvertFrom-Json -Depth 64
@@ -249,6 +255,9 @@ try {
         $configAfterUpgrade.theme.titleWidth -eq 35 -and
         $configAfterUpgrade.theme.titleBackground -eq "solid"
     ) "Reinstall did not add fixed-width solid title defaults."
+    Assert-True (
+        $configAfterUpgrade.prompts.restartNotice -match "/restart"
+    ) "Reinstall did not add restart prompt defaults."
 
     $configAfterUpgrade.theme.decoration = [pscustomobject]@{
         leftGlyphs = @("[")

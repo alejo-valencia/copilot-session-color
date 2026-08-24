@@ -139,7 +139,13 @@ $config = Read-JsonObject -Path $configPath
 if ([int](Get-ObjectProperty -Object $config -Name "schemaVersion" -Default 0) -ne 1) {
     throw "Unsupported configuration schema version."
 }
-
+$prompts = Get-ObjectProperty -Object $config -Name "prompts"
+$restartNotice = [string](
+    Get-ObjectProperty `
+        -Object $prompts `
+        -Name "restartNotice" `
+        -Default "If this is your first /color command in this session and the color is not visible yet, run /restart once to apply the statusline."
+)
 $theme = Get-ObjectProperty -Object $config -Name "theme"
 $namedColors = Get-ObjectProperty -Object $theme -Name "namedColors"
 if ($null -eq $namedColors -or $namedColors -isnot [pscustomobject]) {
@@ -211,4 +217,7 @@ if ($resolvedColor.IsAutomatic) {
 }
 else {
     "Set Copilot session $SessionId to $($resolvedColor.Name) (ANSI $($resolvedColor.AnsiColor))."
+}
+if (-not [string]::IsNullOrWhiteSpace($restartNotice)) {
+    $restartNotice
 }
